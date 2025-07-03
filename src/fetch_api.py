@@ -13,8 +13,5 @@ def fetch_api(url):
 def get_list_breweries():
   url = 'https://api.openbrewerydb.org/v1/breweries'
   list_breweries = fetch_api(url)
-  print(len(ist_breweries))
+  print(len(list_breweries))
   return list_breweries
-
-
-get_list_breweries()

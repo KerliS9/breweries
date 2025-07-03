@@ -1,48 +1,62 @@
 version: '3'
 
 services:
-  db:
-    image: postgres:latest
-    container_name: db
-    restart: always
-    volumes:
-      - data_db:/var/lib/postgresql/data
-      - ./src/init_db:/docker-entrypoint-initdb.d
+  postgres:
+    image: postgres:14
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
-    networks:
-      - app-network
+    volumes:
+      - pg_data:/var/lib/postgresql/data
 
-  web:
-    image: python:3.8
-    container_name: python_api
-    restart: unless-stopped
+  spark:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: src/Dockerfile
+    container_name: spark_src
     volumes:
-      - .:/src
-    ports:
-      - "5000:5000"
-    environment:
-      FLASK_APP: ./src/flask_routes.py
-      FLASK_DEBUG: 1
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_PORT: ${POSTGRES_PORT}
+      - ./src:/app
+      - ./volumes/warehouse:/warehouse
     depends_on:
-      - db
-    networks:
-      - app-network
+      - postgres
+    ports:
+      - "4040:4040"
+    entrypoint: ["sleep", "infinity"]
+
+  airflow-webserver:
+    image: apache/airflow:2.9.0
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__CORE__FERNET_KEY: 'fernetkey'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./src:/app
+      - ./volumes/warehouse:/warehouse
+      - ./requirements.txt:/requirements.txt
+    ports:
+      - "8080:8080"
+    command: webserver
+    depends_on:
+      - postgres
+
+  airflow-scheduler:
+    image: apache/airflow:2.9.0
+    depends_on:
+      - airflow-webserver
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__CORE__FERNET_KEY: 'fernetkey'
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./src:/app
+      - ./volumes/warehouse:/warehouse
+    command: scheduler
 
 volumes:
-  data_db:
-
-networks:
-  app-network:
+  pg_data:
