@@ -12,6 +12,20 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
+  airflow-init:
+    image: apache/airflow:2.9.0
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./src:/app
+    command: >
+      bash -c "airflow db init &&
+              airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com"
+
   spark:
     build:
       context: .
@@ -31,7 +45,7 @@ services:
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      AIRFLOW__CORE__FERNET_KEY: 'fernetkey'
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     volumes:
       - ./dags:/opt/airflow/dags
@@ -43,6 +57,7 @@ services:
     command: webserver
     depends_on:
       - postgres
+      - airflow-init
 
   airflow-scheduler:
     image: apache/airflow:2.9.0
@@ -51,7 +66,7 @@ services:
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      AIRFLOW__CORE__FERNET_KEY: 'fernetkey'
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
     volumes:
       - ./dags:/opt/airflow/dags
       - ./src:/app
