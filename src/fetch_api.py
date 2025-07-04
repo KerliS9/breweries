@@ -15,3 +15,6 @@ def get_list_breweries():
   list_breweries = fetch_api(url)
   print(len(list_breweries))
   return list_breweries
+
+
+// GET https://api.openbrewerydb.org/v1/breweries?per_page=3

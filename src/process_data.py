@@ -10,13 +10,13 @@ spark = SparkSession.builder \
     .config("spark.jars", "/opt/bitnami/spark/jars/postgresql.jar") \
     .getOrCreate()
 
-def request_and_save():
+def request_and_save_breweries():
     response_data = get_list_breweries()
     print(response_data)
     insert_raw_data(response_data)
 
 
-def normalize_and_partition_data():
+def normalize_and_partition_breweries():
     df_raw = read_from_postgres(spark, 'rw_list_breweries')
     df_normalized = normalize_schema(df_raw, brewery_schema)
     write_delta_partitioned(df_normalized, '/warehouse/delta/particionado', 'location')

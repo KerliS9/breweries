@@ -3,6 +3,7 @@ version: '3'
 services:
   postgres:
     image: postgres:14
+    container_name: postgres_breweries
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -13,24 +14,28 @@ services:
       - pg_data:/var/lib/postgresql/data
 
   airflow-init:
-    image: apache/airflow:2.9.0
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: airflow_init_breweries
     depends_on:
       - postgres
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
     volumes:
       - ./dags:/opt/airflow/dags
       - ./src:/app
     command: >
-      bash -c "airflow db init &&
+      bash -c "airflow db migrate &&
+              airflow connections create-default-connections &&
               airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com"
 
   spark:
     build:
       context: .
       dockerfile: src/Dockerfile
-    container_name: spark_src
+    container_name: src_breweries
     volumes:
       - ./src:/app
       - ./volumes/warehouse:/warehouse
@@ -41,12 +46,16 @@ services:
     entrypoint: ["sleep", "infinity"]
 
   airflow-webserver:
-    image: apache/airflow:2.9.0
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: airflow_webserver_breweries
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      PYTHONPATH: /app
     volumes:
       - ./dags:/opt/airflow/dags
       - ./src:/app
@@ -60,13 +69,17 @@ services:
       - airflow-init
 
   airflow-scheduler:
-    image: apache/airflow:2.9.0
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: airflow_scheduler_breweries
     depends_on:
       - airflow-webserver
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
+      PYTHONPATH: /app
     volumes:
       - ./dags:/opt/airflow/dags
       - ./src:/app
