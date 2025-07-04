@@ -28,9 +28,14 @@ services:
       - ./src:/app
       - ./jars:/opt/bitnami/spark/jars
     command: >
-      bash -c "airflow db migrate &&
-              airflow connections create-default-connections &&
-              airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com"
+      bash -c "
+        until pg_isready -h ${POSTGRES_HOST} -p ${POSTGRES_PORT}; do
+          echo 'Waiting for Postgres...';
+          sleep 2;
+        done &&
+        airflow db migrate &&
+        airflow connections create-default-connections &&
+        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com"
 
   spark:
     build:
@@ -65,7 +70,15 @@ services:
       - ./jars:/opt/bitnami/spark/jars
     ports:
       - "8080:8080"
-    command: webserver
+    command: >
+      bash -c "
+        until pg_isready -h postgres -p 5432; do
+          echo 'Waiting for Postgres...';
+          sleep 2;
+        done &&
+        airflow db migrate &&
+        airflow webserver
+      "
     depends_on:
       - postgres
       - airflow-init
@@ -87,7 +100,13 @@ services:
       - ./src:/app
       - ./volumes/warehouse:/warehouse
       - ./jars:/opt/bitnami/spark/jars
-    command: scheduler
+    command: >
+      bash -c "
+        until pg_isready -h ${POSTGRES_HOST} -p ${POSTGRES_PORT}; do
+          echo 'Waiting for Postgres...';
+          sleep 2;
+        done &&
+        airflow scheduler"
 
 volumes:
   pg_data:
