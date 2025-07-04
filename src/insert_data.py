@@ -1,4 +1,4 @@
-from utils import get_db_connection, cur_fetchall, delete_data_from_table
+from utils import get_db_connection, delete_data_from_table
 from psycopg2.extras import execute_values 
 
 

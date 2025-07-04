@@ -22,10 +22,11 @@ services:
       - postgres
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     volumes:
       - ./dags:/opt/airflow/dags
       - ./src:/app
+      - ./jars:/opt/bitnami/spark/jars
     command: >
       bash -c "airflow db migrate &&
               airflow connections create-default-connections &&
@@ -52,7 +53,7 @@ services:
     container_name: airflow_webserver_breweries
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
       PYTHONPATH: /app
@@ -61,6 +62,7 @@ services:
       - ./src:/app
       - ./volumes/warehouse:/warehouse
       - ./requirements.txt:/requirements.txt
+      - ./jars:/opt/bitnami/spark/jars
     ports:
       - "8080:8080"
     command: webserver
@@ -77,13 +79,14 @@ services:
       - airflow-webserver
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
       PYTHONPATH: /app
     volumes:
       - ./dags:/opt/airflow/dags
       - ./src:/app
       - ./volumes/warehouse:/warehouse
+      - ./jars:/opt/bitnami/spark/jars
     command: scheduler
 
 volumes:

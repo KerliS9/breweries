@@ -58,6 +58,8 @@ breweries/
 
 I start using Flask to see request from API. Then change to Airflow scheduler, through docker compose, to make an integrated project.
 
+The biggest challenge was configured the docker-compose for code run correctly. I face a lot of errors of import, because the way I decided to separate the project code.
+
 # Used technologies:
 
 - Git

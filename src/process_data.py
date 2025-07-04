@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
-from etl_utils.read import read_from_postgres
-from etl_utils.write import write_delta_partitioned
-from etl_utils.transform import normalize_schema
+from elt_utils.read import read_from_postgres
+from elt_utils.write import write_delta_partitioned
+from elt_utils.transform import normalize_schema
 from fetch_api import get_list_breweries
 from insert_data import insert_raw_data
 

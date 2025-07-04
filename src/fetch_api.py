@@ -1,9 +1,9 @@
 import requests
 import json
 
-def fetch_api(url):
+def fetch_api(url, params):
   try:
-    response = requests.get(url)
+    response = requests.get(url, params)
     if response.status_code == 200:
       return response.json()
   except Exception as ex:
@@ -11,10 +11,16 @@ def fetch_api(url):
 
 
 def get_list_breweries():
-  url = 'https://api.openbrewerydb.org/v1/breweries'
-  list_breweries = fetch_api(url)
-  print(len(list_breweries))
-  return list_breweries
+    base_url = "https://api.openbrewerydb.org/v1/breweries"
+    all_breweries = []
+    page = 1
+    per_page = 200
 
-
-// GET https://api.openbrewerydb.org/v1/breweries?per_page=3
+    while True:
+        list_breweries = fetch_api(base_url, params={"page": page, "per_page": per_page})
+        if not list_breweries:
+            break
+        all_breweries.extend(list_breweries)
+        page += 1
+    print(len(all_breweries))
+    return all_breweries
