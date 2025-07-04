@@ -24,3 +24,6 @@ def get_list_breweries():
         page += 1
     print(len(all_breweries))
     return all_breweries
+
+
+#subir docker e validar se API esta funcionando

@@ -76,7 +76,6 @@ services:
           echo 'Waiting for Postgres...';
           sleep 2;
         done &&
-        airflow db migrate &&
         airflow webserver
       "
     depends_on:
