@@ -1,10 +1,14 @@
-from utils import get_db_connection, delete_data_from_table
-from psycopg2.extras import execute_values 
+from utils import get_db_connection, ensure_table_exists
+from psycopg2.extras import execute_values
+from psql_queries import create_rw_list_breweries, insert_rw_list_breweries
 
 
-def insert_raw_data(response_data):
+def insert_raw_data(spark, response_data):
     table_name = 'rw_list_breweries'
-    delete_data_from_table(table_name)
+    if ensure_table_exists.startswith(f'Table {table_name}')
+        spark.sql(create_rw_list_breweries)
+    else:
+        spark.sql(f'DELETE FROM {table_name}')
     try:
         with get_db_connection() as conn:
             with conn.cursor() as cur:

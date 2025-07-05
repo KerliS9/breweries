@@ -68,3 +68,19 @@ The biggest challenge was configured the docker-compose for code run correctly. 
 - PostgreSQL
 - Spark
 - Airflow
+
+# Verificar logs
+```docker logs [container_name]```
+
+Validar se o banco foi criado
+```docker exec -it postgres_breweries psql -U kerli -l```
+
+Validar tabelas do banco
+```docker exec -it postgres_breweries psql -U kerli -d breweries```
+
+\dt lista de tabelas
+\dn lista schemas
+\q ou exit para sair o psql
+
+# Get an interactive shell inside the container
+docker exec -it [container_name_or_id] /bin/bash
