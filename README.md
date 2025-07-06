@@ -37,7 +37,7 @@ password: admin
 ```
 breweries/
 ├── dags/
-│   ├── dag_breweries.py
+│   └── dag_breweries.py
 ├── src/
 │   ├── Dockerfile
 │   ├── fetch_api.py
@@ -46,8 +46,14 @@ breweries/
 │   └── elt_utils/
 |      ├── schemas.py
 │      └── write.py
+├── unit_tests/
+│   ├── fetch_api_tests.py
+│   └── process_data_test.py
 ├── volumes/
 |   └── warehouse/
+|     ├── bronze
+|     ├── gold
+│     └── silver
 ├── docker-compose.yml
 ├── Dockerfile.airflow
 ├── requirements.txt
