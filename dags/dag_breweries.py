@@ -6,7 +6,7 @@ sys.path.insert(0, '/app')
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
-from process_data import request_and_save_breweries, normalize_and_partition_breweries
+from process_data import request_and_save_breweries, normalize_and_partition_breweries, aggregated_breweries
 
 
 default_args = {
@@ -29,14 +29,14 @@ with DAG(
         python_callable=request_and_save_breweries
     )
 
-    spark_etl_task = PythonOperator(
+    silver_task = PythonOperator(
         task_id='normalize_and_partition_breweries',
         python_callable=normalize_and_partition_breweries
     )
 
-    spark_etl_task = PythonOperator(
-        task_id='normalize_and_partition_breweries',
-        python_callable=normalize_and_partition_breweries
+    agg_task = PythonOperator(
+        task_id='aggregated_breweries',
+        python_callable=aggregated_breweries
     )
 
-    ingest_task >> spark_etl_task 
+    ingest_task >> silver_task >> agg_task
