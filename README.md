@@ -25,9 +25,9 @@ POSTGRES_PORT=5432
 AIRFLOW__CORE__FERNET_KEY= with python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT=90
 ```
-Run $ `docker-compose up --build -d`. Wait the building to finished.
+Run $ `docker-compose up -d --build`. Wait the building to finished.
 
-Then open the browser with `http://localhost:8080/home`
+Then open the browser with `http://localhost:8080`
 ```
 user: admin
 password: admin
