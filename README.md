@@ -28,11 +28,12 @@ AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT=90
 Run $ `docker-compose up --build -d`. Wait the building to finished.
 
 Then open the browser with `http://localhost:8080/home`
-
+```
 user: admin
 password: admin
+```
 
-Project structure
+## Project structure
 ```
 breweries/
 ├── dags/
@@ -53,13 +54,13 @@ breweries/
 ├── README.md
 └── .env
 ```
-### Decisions made
+## Decisions made
 
 I start using Flask to see request from API. Then change to Airflow scheduler, through docker compose, to make an integrated project.
 
 The biggest challenge was configured the docker-compose for code run correctly.
 
-# Used technologies:
+## Used technologies:
 
 - Git
 - Docker-compose
@@ -69,36 +70,25 @@ The biggest challenge was configured the docker-compose for code run correctly.
 - Spark
 - Airflow
 
-# Monitoring and Alerting
+## Monitoring and Alerting
 In case, I want to set an alerting to my pipeline. I would add some configs to default args
 ```
-    'email': ['kerlischroeder9@gmail.com'],
-    'email_on_failure': True,
-    'email_on_retry': False,
+'email': ['kerlischroeder9@gmail.com'],
+'email_on_failure': True,
+'email_on_retry': False,
 ```
 And configure a valid SMTP server, adding this configs to docker-compose or `airflow.cfg` file. Password should be saved at `.env` file.
 ```
-    AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
-    AIRFLOW__SMTP__SMTP_PORT: 587
-    AIRFLOW__SMTP__SMTP_USER: emaildotime@gmail.com
-    AIRFLOW__SMTP__SMTP_PASSWORD: sua_app_password
-    AIRFLOW__SMTP__SMTP_MAIL_FROM: emaildotime@gmail.com
-    AIRFLOW__SMTP__SMTP_STARTTLS: 'True'
-    AIRFLOW__SMTP__SMTP_SSL: 'False'
+AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
+AIRFLOW__SMTP__SMTP_PORT: 587
+AIRFLOW__SMTP__SMTP_USER: emaildotime@gmail.com
+AIRFLOW__SMTP__SMTP_PASSWORD: sua_app_password
+AIRFLOW__SMTP__SMTP_MAIL_FROM: emaildotime@gmail.com
+AIRFLOW__SMTP__SMTP_STARTTLS: 'True'
+AIRFLOW__SMTP__SMTP_SSL: 'False'
 ```
 
-# Verificar logs
-```docker logs [container_name]```
+# Adicional
 
-Validar se o banco foi criado
-```docker exec -it postgres_breweries psql -U kerli -l```
-
-Validar tabelas do banco
-```docker exec -it postgres_breweries psql -U kerli -d breweries```
-
-\dt lista de tabelas
-\dn lista schemas
-\q ou exit para sair o psql
-
-# Get an interactive shell inside the container
+## Get an interactive shell inside the container
 docker exec -it [container_name_or_id] bash
