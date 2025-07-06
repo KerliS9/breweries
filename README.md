@@ -72,19 +72,19 @@ The biggest challenge was configured the docker-compose for code run correctly.
 # Monitoring and Alerting
 In case, I want to set an alerting to my pipeline. I would add some configs to default args
 ```
-'email': ['kerlischroeder9@gmail.com'],
+    'email': ['kerlischroeder9@gmail.com'],
     'email_on_failure': True,
     'email_on_retry': False,
 ```
 And configure a valid SMTP server, adding this configs to docker-compose or `airflow.cfg` file. Password should be saved at `.env` file.
 ```
-AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
-AIRFLOW__SMTP__SMTP_PORT: 587
-AIRFLOW__SMTP__SMTP_USER: emaildotime@gmail.com
-AIRFLOW__SMTP__SMTP_PASSWORD: sua_app_password
-AIRFLOW__SMTP__SMTP_MAIL_FROM: emaildotime@gmail.com
-AIRFLOW__SMTP__SMTP_STARTTLS: 'True'
-AIRFLOW__SMTP__SMTP_SSL: 'False'
+    AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
+    AIRFLOW__SMTP__SMTP_PORT: 587
+    AIRFLOW__SMTP__SMTP_USER: emaildotime@gmail.com
+    AIRFLOW__SMTP__SMTP_PASSWORD: sua_app_password
+    AIRFLOW__SMTP__SMTP_MAIL_FROM: emaildotime@gmail.com
+    AIRFLOW__SMTP__SMTP_STARTTLS: 'True'
+    AIRFLOW__SMTP__SMTP_SSL: 'False'
 ```
 
 # Verificar logs
