@@ -5,6 +5,10 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY . .
+RUN apt-get update && apt-get install -y openjdk-17-jdk
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
-CMD ["python", "-m", "unittest", "discover", "-s", "unit_tests"]
+COPY src/ src/
+COPY tests/ tests/
+
+CMD ["pytest", "--cov=src", "--cov=dags", "--cov-report=term-missing", "-v", "tests"]

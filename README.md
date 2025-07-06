@@ -37,23 +37,28 @@ Then open the browser with `http://localhost:8080`
 user: admin
 password: admin
 ```
+To check test - run $ `docker-compose run --rm test-runner`
 
 ## Project structure
 ```
 breweries/
 ├── dags/
+│   ├── __init__.py
 │   └── dag_breweries.py
 ├── src/
+│   ├── __init__.py
 │   ├── Dockerfile
 │   ├── fetch_api.py
 │   ├── process_data.py
 │   └── utils.py
 │   └── elt_utils/
+|      ├── __init__.py
 |      ├── schemas.py
 │      └── write.py
-├── unit_tests/
-│   ├── fetch_api_tests.py
-│   └── process_data_test.py
+├── tests/
+│   ├── __init__.py
+│   ├── test_fetch_api.py
+│   └── test_process_data.py
 ├── volumes/
 |   └── warehouse/
 |     ├── bronze

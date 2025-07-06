@@ -155,16 +155,15 @@ services:
       context: .
       dockerfile: Dockerfile.test
     volumes:
-      - .:/app
+      - ./src:/app/src
+      - ./tests:/app/tests
     container_name: test_breweries
-    #restart: on-failure
+    working_dir: /app
+    restart: on-failure
     environment:
-      PYTHONPATH: /app
+      PYTHONPATH: /app/src
     depends_on:
-      - postgres
       - spark
-      - airflow-init
-    command: ["pytest", "unit_tests"]
 
 volumes:
   pg_data:
