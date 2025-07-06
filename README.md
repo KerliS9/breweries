@@ -30,6 +30,8 @@ Run $ `docker-compose up -d --build`. Wait the building to finished.
 
 Check $ `docker logs airflow_init_breweries`. Logs 'Database migrating done!' must be present.
 
+Run $ `chmod -R 777 ./volumes/warehouse` for Airflow to have access to read and write inside the volumes of this project.
+
 Then open the browser with `http://localhost:8080`
 ```
 user: admin
