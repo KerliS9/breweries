@@ -19,4 +19,4 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 
 USER airflow
 
-RUN pip install pyspark==3.5.1
+RUN pip install pyspark==3.4.1

@@ -17,11 +17,13 @@ Clone this repoh $ `git clone git@github.com:KerliS9/breweries.git`
 
 Set your file `.env` file, like this:
 ```
-  POSTGRES_USER=postgres
-  POSTGRES_PASSWORD=postgres
-  POSTGRES_DB=breweries
-  POSTGRES_HOST=db
-  POSTGRES_PORT=5432
+POSTGRES_USER=your_name
+POSTGRES_PASSWORD=postgres_breweries
+POSTGRES_DB=breweries
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+AIRFLOW__CORE__FERNET_KEY= with python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT=90
 ```
 Run $ `docker-compose up --build -d`. Wait the building to finished.
 
@@ -38,13 +40,10 @@ breweries/
 ├── src/
 │   ├── Dockerfile
 │   ├── fetch_api.py
-│   ├── insert_data.py
 │   ├── process_data.py
 │   └── utils.py
 │   └── elt_utils/
-│      ├── read.py
 |      ├── schemas.py
-|      ├── transform.py
 │      └── write.py
 ├── volumes/
 |   └── warehouse/
@@ -58,16 +57,35 @@ breweries/
 
 I start using Flask to see request from API. Then change to Airflow scheduler, through docker compose, to make an integrated project.
 
-The biggest challenge was configured the docker-compose for code run correctly. I face a lot of errors of import, because the way I decided to separate the project code.
+The biggest challenge was configured the docker-compose for code run correctly.
 
 # Used technologies:
 
 - Git
 - Docker-compose
 - Python
+- Pyspark
 - PostgreSQL
 - Spark
 - Airflow
+
+# Monitoring and Alerting
+In case, I want to set an alerting to my pipeline. I would add some configs to default args
+```
+'email': ['kerlischroeder9@gmail.com'],
+    'email_on_failure': True,
+    'email_on_retry': False,
+```
+And configure a valid SMTP server, adding this configs to docker-compose or `airflow.cfg` file. Password should be saved at `.env` file.
+```
+AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
+AIRFLOW__SMTP__SMTP_PORT: 587
+AIRFLOW__SMTP__SMTP_USER: emaildotime@gmail.com
+AIRFLOW__SMTP__SMTP_PASSWORD: sua_app_password
+AIRFLOW__SMTP__SMTP_MAIL_FROM: emaildotime@gmail.com
+AIRFLOW__SMTP__SMTP_STARTTLS: 'True'
+AIRFLOW__SMTP__SMTP_SSL: 'False'
+```
 
 # Verificar logs
 ```docker logs [container_name]```

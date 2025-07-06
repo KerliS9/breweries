@@ -1,26 +1,47 @@
-from elt_utils.read import read_from_postgres
-from elt_utils.write import write_delta_partitioned
-from elt_utils.transform import normalize_schema
+import json
+from pyspark.sql.functions import lit, current_timestamp, from_json, col
+
+from utils import init_spark
+from elt_utils.write import write_delta, write_delta_partitioned
+from elt_utils.schemas import breweries_schema
 from fetch_api import get_list_breweries
-from insert_data import insert_raw_data
 
-
-def init_spark():
-  from pyspark.sql import SparkSession
-  spark = SparkSession.builder \
-      .appName("ETL Breweries - Postgres to Delta") \
-      .config("spark.jars", "/opt/bitnami/spark/jars/postgresql.jar") \
-      .getOrCreate()
-  return spark
 
 def request_and_save_breweries():
+    spark = init_spark()
+    table_name = 'rw_list_breweries'
     response_data = get_list_breweries()
-    print('request_and_save_breweries:', response_data[0])
-    insert_raw_data(response_data)
-request_and_save_breweries()
+    raw_data = [(json.dumps(record),) for record in response_data]
+    df_raw = spark.createDataFrame(data=raw_data, schema=['data'])
+    df_final = df_raw.withColumn('timestamp_ingestion', current_timestamp())
+    print('request_and_save_breweries:', df_final.limit(1).collect())
+    write_delta(df_final, f'/warehouse/delta/particionado/bronze/{table_name}')
+#request_and_save_breweries()
 
 def normalize_and_partition_breweries():
     spark = init_spark()
-    df_raw = read_from_postgres(spark, 'rw_list_breweries')
-    df_normalized = normalize_schema(df_raw, brewery_schema)
-    write_delta_partitioned(df_normalized, '/warehouse/delta/particionado', 'location')
+    table_name = 'silver_list_breweries'
+    path = '/warehouse/delta/particionado'
+    df_raw = spark.read.load(f'{path}/bronze/rw_list_breweries')
+    df_final = (
+        df_raw
+        .withColumn('json_data', from_json(col('data'), breweries_schema))
+        .select('json_data.*', 'timestamp_ingestion')
+    )
+    print('normalize_and_partition_breweries:', df_final.limit(1).collect())
+    #write_delta_partitioned(df_final, f'{path}/silver/{table_name}', 'state')
+normalize_and_partition_breweries()
+
+def aggregated_breweries():
+    spark = init_spark()
+    table_name = 'ac_list_breweries'
+    path = '/warehouse/delta/particionado'
+    df = spark.read.load(f'{path}/silver/silver_list_breweries')
+    df_final = (
+        df
+        .groupBy('type', 'country', 'state')
+        .count()
+    )
+    print('normalize_and_partition_breweries:', df_final.collect())
+    #write_delta(df_final, f'/warehouse/delta/particionado/gold/{table_name}')
+aggregated_breweries()
