@@ -16,7 +16,7 @@ def request_and_save_breweries():
     df_final = df_raw.withColumn('timestamp_ingestion', current_timestamp())
     print('request_and_save_breweries:', df_final.limit(1).collect())
     write_delta(df_final, f'/warehouse/delta/particionado/bronze/{table_name}')
-#request_and_save_breweries()
+
 
 def normalize_and_partition_breweries():
     spark = init_spark()
@@ -43,5 +43,5 @@ def aggregated_breweries():
         .count()
     )
     print('normalize_and_partition_breweries:', df_final.collect())
-    #write_delta(df_final, f'/warehouse/delta/particionado/gold/{table_name}')
-#aggregated_breweries()
+    write_delta(df_final, f'/warehouse/delta/particionado/gold/{table_name}')
+

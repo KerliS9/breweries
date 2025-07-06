@@ -18,7 +18,7 @@ default_args = {
 
 
 with DAG(
-    dag_id='etl_breweries_dag',
+    dag_id='elt_breweries_dag',
     default_args=default_args,
     schedule_interval="@daily",
     catchup=False

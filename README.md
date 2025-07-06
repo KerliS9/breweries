@@ -22,10 +22,13 @@ POSTGRES_PASSWORD=postgres_breweries
 POSTGRES_DB=breweries
 POSTGRES_HOST=postgres
 POSTGRES_PORT=5432
-AIRFLOW__CORE__FERNET_KEY= with python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+AIRFLOW__CORE__FERNET_KEY= run python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT=90
+AIRFLOW__WEBSERVER__SECRET_KEY= run python -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
 Run $ `docker-compose up -d --build`. Wait the building to finished.
+
+Check $ `docker logs airflow_init_breweries`. Logs 'Database migrating done!' must be present.
 
 Then open the browser with `http://localhost:8080`
 ```
@@ -93,6 +96,8 @@ AIRFLOW__SMTP__SMTP_MAIL_FROM: emaildotime@gmail.com
 AIRFLOW__SMTP__SMTP_STARTTLS: 'True'
 AIRFLOW__SMTP__SMTP_SSL: 'False'
 ```
+
+For quality checks could implement a quality check with soda, setting like the columns that shouldn't be null or which columns should be present at the table.
 
 # Adicional
 
