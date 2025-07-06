@@ -1,6 +1,5 @@
 import sys
 import os
-print("sys.path:", sys.path)
 sys.path.insert(0, '/app')
 
 from airflow import DAG
@@ -12,7 +11,7 @@ from process_data import request_and_save_breweries, normalize_and_partition_bre
 default_args = {
     'owner': 'kerli.schroeder',
     'start_date': datetime(2025, 7, 3),
-    # 'retries': 2,
+    'retries': 2,
     'retry_delay': timedelta(minutes=5),
 }
 
