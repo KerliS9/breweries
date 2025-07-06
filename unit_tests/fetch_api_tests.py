@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from fetch_api import get_list_breweries  # Replace with actual import
+from app.fetch_api import get_list_breweries  # Replace with actual import
 
 class TestGetListBreweries(unittest.TestCase):
     @patch('fetch_api')  # Mock the fetch_api dependency

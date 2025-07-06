@@ -15,33 +15,31 @@ def request_and_save_breweries():
     df_raw = spark.createDataFrame(data=raw_data, schema=['data'])
     df_final = df_raw.withColumn('timestamp_ingestion', current_timestamp())
     print('request_and_save_breweries:', df_final.limit(1).collect())
-    write_delta(df_final, f'/warehouse/delta/particionado/bronze/{table_name}')
+    write_delta(df_final, f'/warehouse/bronze/{table_name}')
 
 
 def normalize_and_partition_breweries():
     spark = init_spark()
     table_name = 'silver_list_breweries'
-    path = '/warehouse/delta/particionado'
-    df_raw = spark.read.load(f'{path}/bronze/rw_list_breweries')
+    df_raw = spark.read.load('/warehouse/bronze/rw_list_breweries')
     df_final = (
         df_raw
         .withColumn('json_data', from_json(col('data'), breweries_schema))
         .select('json_data.*', 'timestamp_ingestion')
     )
     print('normalize_and_partition_breweries:', df_final.limit(1).collect())
-    write_delta_partitioned(df_final, f'{path}/silver/{table_name}', 'country')
+    write_delta_partitioned(df_final, f'/warehouse/silver/{table_name}', 'country')
 
 
 def aggregated_breweries():
     spark = init_spark()
     table_name = 'ac_agg_breweries'
-    path = '/warehouse/delta/particionado'
-    df = spark.read.load(f'{path}/silver/silver_list_breweries')
+    df = spark.read.load('/warehouse/silver/silver_list_breweries')
     df_final = (
         df
         .groupBy('brewery_type', 'country')
         .count()
     )
     print('normalize_and_partition_breweries:', df_final.collect())
-    write_delta(df_final, f'/warehouse/delta/particionado/gold/{table_name}')
+    write_delta(df_final, f'/warehouse/gold/{table_name}')
 

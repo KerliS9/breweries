@@ -158,6 +158,8 @@ services:
       - .:/app
     container_name: test_breweries
     restart: on-failure
+    environment:
+      PYTHONPATH: /app
     depends_on:
       - spark
     command: ["pytest", "unit_tests"]

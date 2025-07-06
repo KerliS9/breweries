@@ -1,4 +1,4 @@
 import sys
 import os
-print("sys.path:", sys.path)
+print("sys.path-test:", sys.path)
 sys.path.insert(0, '/app')
