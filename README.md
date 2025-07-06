@@ -96,8 +96,11 @@ AIRFLOW__SMTP__SMTP_SSL: 'False'
 
 # Adicional
 
-## Get an interactive shell inside the container
-docker exec -it [container_name_or_id] bash
+### Check Logs
+`docker logs [container_name] bash`
 
-Remove all volumes created inside this project
+### Get an interactive shell inside the container
+`docker exec -it [container_name] bash`
+
+### Remove all volumes created inside this project
 ```docker compose down -v --remove-orphans```

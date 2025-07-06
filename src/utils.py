@@ -6,5 +6,6 @@ def init_spark():
         .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
         .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
         .config("spark.sql.debug.maxToStringFields", "1000") \
+        .config("spark.ui.port", "4050") \
         .getOrCreate()
     return spark
