@@ -101,4 +101,4 @@ Validar tabelas do banco
 \q ou exit para sair o psql
 
 # Get an interactive shell inside the container
-docker exec -it [container_name_or_id] /bin/bash
+docker exec -it [container_name_or_id] bash

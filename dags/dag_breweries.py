@@ -12,7 +12,6 @@ from process_data import request_and_save_breweries, normalize_and_partition_bre
 default_args = {
     'owner': 'kerli.schroeder',
     'start_date': datetime(2025, 7, 3),
-    
     'retries': 2,
     'retry_delay': timedelta(minutes=5),
 }
@@ -28,6 +27,11 @@ with DAG(
     ingest_task = PythonOperator(
         task_id='request_and_save_breweries',
         python_callable=request_and_save_breweries
+    )
+
+    spark_etl_task = PythonOperator(
+        task_id='normalize_and_partition_breweries',
+        python_callable=normalize_and_partition_breweries
     )
 
     spark_etl_task = PythonOperator(

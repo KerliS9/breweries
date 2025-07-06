@@ -29,7 +29,7 @@ def normalize_and_partition_breweries():
         .select('json_data.*', 'timestamp_ingestion')
     )
     print('normalize_and_partition_breweries:', df_final.limit(1).collect())
-    #write_delta_partitioned(df_final, f'{path}/silver/{table_name}', 'state')
+    write_delta_partitioned(df_final, f'{path}/silver/{table_name}', 'country')
 normalize_and_partition_breweries()
 
 def aggregated_breweries():
@@ -39,7 +39,7 @@ def aggregated_breweries():
     df = spark.read.load(f'{path}/silver/silver_list_breweries')
     df_final = (
         df
-        .groupBy('type', 'country', 'state')
+        .groupBy('brewery_type', 'country')
         .count()
     )
     print('normalize_and_partition_breweries:', df_final.collect())
