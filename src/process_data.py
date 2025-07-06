@@ -1,5 +1,6 @@
 import json
-from pyspark.sql.functions import lit, current_timestamp, from_json, col
+from pyspark.sql.functions import lit, current_timestamp, from_json, col, trim
+from pyspark.sql.types import StringType
 
 from utils import init_spark
 from elt_utils.write import write_delta, write_delta_partitioned
@@ -25,7 +26,12 @@ def normalize_and_partition_breweries():
     df_final = (
         df_raw
         .withColumn('json_data', from_json(col('data'), breweries_schema))
-        .select('json_data.*', 'timestamp_ingestion')
+        .select(
+          *[trim(col(f"json_data.{field.name}")).alias(field.name) 
+            for field in breweries_schema.fields 
+            if isinstance(field.dataType, StringType)],
+          col("timestamp_ingestion")  # Mantém colunas não-string (opcional)
+        )
     )
     print('normalize_and_partition_breweries:', df_final.limit(1).collect())
     write_delta_partitioned(df_final, f'/warehouse/silver/{table_name}', 'country')
