@@ -22,21 +22,27 @@ POSTGRES_PASSWORD=postgres_breweries
 POSTGRES_DB=breweries
 POSTGRES_HOST=postgres
 POSTGRES_PORT=5432
-AIRFLOW__CORE__FERNET_KEY= with python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+AIRFLOW__CORE__FERNET_KEY= run python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT=90
+AIRFLOW__WEBSERVER__SECRET_KEY= run python -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
-Run $ `docker-compose up --build -d`. Wait the building to finished.
+Run $ `docker-compose up -d --build`. Wait the building to finished.
 
-Then open the browser with `http://localhost:8080/home`
+Check $ `docker logs airflow_init_breweries`. Logs 'Database migrating done!' must be present.
 
+Run $ `chmod -R 777 ./volumes/warehouse` for Airflow to have access to read and write inside the volumes of this project.
+
+Then open the browser with `http://localhost:8080`
+```
 user: admin
 password: admin
+```
 
-Project structure
+## Project structure
 ```
 breweries/
 ├── dags/
-│   ├── dag_breweries.py
+│   └── dag_breweries.py
 ├── src/
 │   ├── Dockerfile
 │   ├── fetch_api.py
@@ -45,21 +51,27 @@ breweries/
 │   └── elt_utils/
 |      ├── schemas.py
 │      └── write.py
+├── unit_tests/
+│   ├── fetch_api_tests.py
+│   └── process_data_test.py
 ├── volumes/
 |   └── warehouse/
+|     ├── bronze
+|     ├── gold
+│     └── silver
 ├── docker-compose.yml
 ├── Dockerfile.airflow
 ├── requirements.txt
 ├── README.md
 └── .env
 ```
-### Decisions made
+## Decisions made
 
 I start using Flask to see request from API. Then change to Airflow scheduler, through docker compose, to make an integrated project.
 
 The biggest challenge was configured the docker-compose for code run correctly.
 
-# Used technologies:
+## Used technologies:
 
 - Git
 - Docker-compose
@@ -69,12 +81,12 @@ The biggest challenge was configured the docker-compose for code run correctly.
 - Spark
 - Airflow
 
-# Monitoring and Alerting
+## Monitoring and Alerting
 In case, I want to set an alerting to my pipeline. I would add some configs to default args
 ```
 'email': ['kerlischroeder9@gmail.com'],
-    'email_on_failure': True,
-    'email_on_retry': False,
+'email_on_failure': True,
+'email_on_retry': False,
 ```
 And configure a valid SMTP server, adding this configs to docker-compose or `airflow.cfg` file. Password should be saved at `.env` file.
 ```
@@ -87,18 +99,15 @@ AIRFLOW__SMTP__SMTP_STARTTLS: 'True'
 AIRFLOW__SMTP__SMTP_SSL: 'False'
 ```
 
-# Verificar logs
-```docker logs [container_name]```
+For quality checks could implement a quality check with soda, setting like the columns that shouldn't be null or which columns should be present at the table.
 
-Validar se o banco foi criado
-```docker exec -it postgres_breweries psql -U kerli -l```
+# Adicional
 
-Validar tabelas do banco
-```docker exec -it postgres_breweries psql -U kerli -d breweries```
+### Check Logs
+`docker logs [container_name] bash`
 
-\dt lista de tabelas
-\dn lista schemas
-\q ou exit para sair o psql
+### Get an interactive shell inside the container
+`docker exec -it [container_name] bash`
 
-# Get an interactive shell inside the container
-docker exec -it [container_name_or_id] bash
+### Remove all volumes created inside this project
+```docker compose down -v --remove-orphans```
