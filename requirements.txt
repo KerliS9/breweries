@@ -7,4 +7,4 @@ pyspark==3.4.1
 delta-spark==2.4.0
 pytest==8.4.1
 pytest-cov==6.2.1
-pytest-mock
+pytest-mock==3.14.0

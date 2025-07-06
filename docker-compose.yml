@@ -157,6 +157,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./tests:/app/tests
+      - ./jars:/opt/spark/jars 
     container_name: test_breweries
     working_dir: /app
     restart: on-failure

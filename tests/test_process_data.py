@@ -1,6 +1,6 @@
 import pytest
 from pyspark.sql import SparkSession
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, PropertyMock
 from pyspark.sql.types import StructType, StructField, StringType, TimestampType
 from src.process_data import normalize_and_partition_breweries  # Replace with actual import
 #from src.elt_utils.schemas import breweries_schema
@@ -9,10 +9,15 @@ from src.process_data import normalize_and_partition_breweries  # Replace with a
 @pytest.fixture
 def spark_session():
     """Fixture to create a SparkSession for testing"""
-    spark = SparkSession.builder \
-        .master("local[1]") \
-        .appName("pytest-pyspark") \
+    spark = (
+        SparkSession.builder
+        .master("local[1]")
+        .appName("pytest-pyspark")
+        .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+        .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
+        .config("spark.jars", "/opt/spark/jars/delta-core_2.12-2.4.0.jar,/opt/spark/jars/delta-storage-2.4.0.jar")
         .getOrCreate()
+    )
     yield spark
     spark.stop()
 
@@ -173,20 +178,21 @@ def test_partitioning_logic(spark_session, mocker):
     test_df = spark_session.createDataFrame(test_data)
     
     # Mock Spark read
-    mocker.patch(
-        'pyspark.sql.SparkSession.read',
-        return_value=MagicMock(load=MagicMock(return_value=test_df))
-    )
+    mock_read = mocker.MagicMock()
+    mock_read.option.return_value = mock_read
+    mock_read.load.return_value = test_df
+
     mocker.patch.object(
-        spark_session.read.option("inferSchema", "true"),
-        'load',
-        return_value=test_df
+        type(spark_session), "read",
+        new_callable=PropertyMock,
+        return_value=mock_read
     )
-    
+
     # Call the function
     normalize_and_partition_breweries()
-    
+    assert mock_write_delta.called, "write_delta_partitioned was not called"
     # Verify partitioning column exists
     args, kwargs = mock_write_delta.call_args
     assert kwargs['partition_column'] == 'country'
     assert 'country' in args[0].columns
+    
