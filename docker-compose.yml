@@ -160,7 +160,7 @@ services:
     restart: on-failure
     depends_on:
       - spark
-    command: ["pytest", "tests"]
+    command: ["pytest", "unit_tests"]
 
 volumes:
   pg_data:
