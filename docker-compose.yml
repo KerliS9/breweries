@@ -157,11 +157,13 @@ services:
     volumes:
       - .:/app
     container_name: test_breweries
-    restart: on-failure
+    #restart: on-failure
     environment:
       PYTHONPATH: /app
     depends_on:
+      - postgres
       - spark
+      - airflow-init
     command: ["pytest", "unit_tests"]
 
 volumes:

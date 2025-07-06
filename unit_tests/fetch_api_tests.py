@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 from app.fetch_api import get_list_breweries  # Replace with actual import
 
 class TestGetListBreweries(unittest.TestCase):
-    @patch('fetch_api')  # Mock the fetch_api dependency
+    @patch('app.fetch_api')  # Mock the fetch_api dependency
     def test_successful_multiple_pages(self, mock_fetch):
         # Setup mock to return different responses for different pages
         mock_fetch.side_effect = [
@@ -27,7 +27,7 @@ class TestGetListBreweries(unittest.TestCase):
             params={"page": 2, "per_page": 200}
         )
     
-    @patch('fetch_api')
+    @patch('app.fetch_api')
     def test_single_page_response(self, mock_fetch):
         # Mock single page response
         mock_data = [{'id': f'brewery_{i}'} for i in range(1, 151)]
