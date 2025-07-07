@@ -157,14 +157,12 @@ services:
     volumes:
       - ./src:/app/src
       - ./tests:/app/tests
-      - ./jars:/opt/spark/jars 
+      - ./jars:/opt/spark/jars
     container_name: test_breweries
     working_dir: /app
     restart: on-failure
     environment:
       PYTHONPATH: /app/src
-    depends_on:
-      - spark
 
 volumes:
   pg_data:

@@ -15,7 +15,7 @@ This repository aims to show a data search project in an API, processing through
 
 Clone this repoh $ `git clone git@github.com:KerliS9/breweries.git`
 
-Set your file `.env` file, like this:
+Set your file `.env` fil like this:
 ```
 POSTGRES_USER=your_name
 POSTGRES_PASSWORD=postgres_breweries
@@ -66,6 +66,7 @@ breweries/
 │     └── silver
 ├── docker-compose.yml
 ├── Dockerfile.airflow
+├── Dockerfile.test
 ├── requirements.txt
 ├── README.md
 └── .env
@@ -87,7 +88,7 @@ The biggest challenge was configured the docker-compose for code run correctly.
 - Airflow
 
 ## Monitoring and Alerting
-In case, I want to set an alerting to my pipeline. I would add some configs to default args
+In case, I needed to set an alerting to my pipeline. I would add some configs to default args at the dag:
 ```
 'email': ['kerlischroeder9@gmail.com'],
 'email_on_failure': True,
@@ -104,7 +105,7 @@ AIRFLOW__SMTP__SMTP_STARTTLS: 'True'
 AIRFLOW__SMTP__SMTP_SSL: 'False'
 ```
 
-For quality checks could implement a quality check with soda, setting like the columns that shouldn't be null or which columns should be present at the table.
+For quality checks it's possible to create and run a quality check with soda. For example: setting the columns that shouldn't be null or which columns should be present at the table.
 
 # Adicional
 

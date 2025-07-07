@@ -13,13 +13,17 @@ def spark_session():
         SparkSession.builder
         .master("local[1]")
         .appName("pytest-pyspark")
+        .config(
+            "spark.jars",
+            "/opt/spark/jars/delta-core_2.12-2.4.0.jar,/opt/spark/jars/delta-storage-2.4.0.jar"
+        )
         .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
         .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
-        .config("spark.jars", "/opt/spark/jars/delta-core_2.12-2.4.0.jar,/opt/spark/jars/delta-storage-2.4.0.jar")
         .getOrCreate()
     )
     yield spark
     spark.stop()
+
 
 def test_normalize_and_partition_breweries(spark_session, mocker):
     """Test the complete normalization and partitioning workflow"""
