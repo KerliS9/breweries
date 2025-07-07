@@ -1,15 +1,9 @@
-import sys
-import os
-print("sys.path-test-fetch:", sys.path)
-sys.path.insert(0, '/app')
-
 import pytest
 from unittest.mock import patch
 from src.fetch_api import get_list_breweries
 
 @patch("src.fetch_api.fetch_api")
 def test_successful_multiple_pages(mock_fetch):
-    # Mock 2 pages of 200 breweries each, then empty response
     mock_fetch.side_effect = [
         [{'id': f'brewery_{i}'} for i in range(1, 201)],
         [{'id': f'brewery_{i}'} for i in range(201, 401)],
