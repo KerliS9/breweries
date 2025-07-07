@@ -208,5 +208,5 @@ __marimo__/
 
 **/_delta_log/
 # Ignorar tudo dentro de volumes/warehouse
-/volumes/warehouse/*
+#/volumes/warehouse/*
 
