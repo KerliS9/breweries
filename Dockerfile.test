@@ -1,12 +1,31 @@
-# Dockerfile.test
 FROM python:3.10-slim
 
+# Diretório de trabalho
 WORKDIR /app
 
+# Copiar requirements e instalar dependências Python
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-RUN pip install pytest
 
-COPY . .
+# Instalar Java
+RUN apt-get update && apt-get install -y openjdk-17-jdk curl
 
-CMD ["pytest", "tests"]
+# Definir JAVA_HOME
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+
+# Instalar Spark manualmente
+ENV SPARK_VERSION=3.4.1
+RUN curl -L https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
+    | tar -xz -C /opt/ && ln -s /opt/spark-${SPARK_VERSION}-bin-hadoop3 /opt/spark
+
+# Criar diretório para os JARs do Delta
+RUN mkdir -p /opt/spark/jars && \
+    curl -L -o /opt/spark/jars/delta-core_2.12-2.4.0.jar https://repo1.maven.org/maven2/io/delta/delta-core_2.12/2.4.0/delta-core_2.12-2.4.0.jar && \
+    curl -L -o /opt/spark/jars/delta-storage-2.4.0.jar https://repo1.maven.org/maven2/io/delta/delta-storage/2.4.0/delta-storage-2.4.0.jar
+
+# Copiar código-fonte e testes
+COPY src/ src/
+COPY tests/ tests/
+
+# Comando de execução dos testes
+CMD ["pytest", "--cov=src", "--cov=dags", "--cov-report=term-missing", "-v", "tests"]

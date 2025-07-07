@@ -2,7 +2,6 @@ FROM apache/airflow:2.9.0
 
 USER root
 
-# Adiciona dependências e Java 17 (disponível no Debian Bullseye)
 RUN apt-get update && \
     apt-get install -y openjdk-17-jdk \
                       iputils-ping \
@@ -13,7 +12,6 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Define JAVA_HOME e adiciona ao PATH
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH="$JAVA_HOME/bin:$PATH"
 

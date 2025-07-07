@@ -1,6 +1,7 @@
 import requests
 import json
 
+
 def fetch_api(url, params):
   try:
     response = requests.get(url, params)

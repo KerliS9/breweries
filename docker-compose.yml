@@ -155,12 +155,14 @@ services:
       context: .
       dockerfile: Dockerfile.test
     volumes:
-      - .:/app
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./jars:/opt/spark/jars
     container_name: test_breweries
+    working_dir: /app
     restart: on-failure
-    depends_on:
-      - spark
-    command: ["pytest", "tests"]
+    environment:
+      PYTHONPATH: /app/src
 
 volumes:
   pg_data:
