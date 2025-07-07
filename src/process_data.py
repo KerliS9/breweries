@@ -16,7 +16,7 @@ def request_and_save_breweries():
     df_raw = spark.createDataFrame(data=raw_data, schema=['data'])
     df_final = df_raw.withColumn('timestamp_ingestion', current_timestamp())
     print('request_and_save_breweries:', df_final.limit(1).collect())
-    write_delta(df_final, f'/warehouse/bronze/{table_name}')
+    write_delta(df=df_final, output_path=f'/warehouse/bronze/{table_name}')
 
 
 def normalize_and_partition_breweries():
@@ -26,15 +26,16 @@ def normalize_and_partition_breweries():
     df_final = (
         df_raw
         .withColumn('json_data', from_json(col('data'), breweries_schema))
+        .filter(col("json_data.id").isNotNull())
         .select(
           *[trim(col(f"json_data.{field.name}")).alias(field.name) 
             for field in breweries_schema.fields 
             if isinstance(field.dataType, StringType)],
-          col("timestamp_ingestion")  # Mantém colunas não-string (opcional)
+          col("timestamp_ingestion")
         )
     )
     print('normalize_and_partition_breweries:', df_final.limit(1).collect())
-    write_delta_partitioned(df_final, f'/warehouse/silver/{table_name}', 'country')
+    write_delta_partitioned(df=df_final, output_path=f'/warehouse/silver/{table_name}', partition_column='country')
 
 
 def aggregated_breweries():
@@ -47,5 +48,5 @@ def aggregated_breweries():
         .count()
     )
     print('normalize_and_partition_breweries:', df_final.collect())
-    write_delta(df_final, f'/warehouse/gold/{table_name}')
+    write_delta(df=df_final, output_path=f'/warehouse/gold/{table_name}')
 

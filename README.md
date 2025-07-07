@@ -1,4 +1,4 @@
-# breweries
+# Breweries
 
 ## Introduction
 
@@ -13,9 +13,9 @@ This repository aims to show a data search project in an API, processing through
 
 ## How to start this project
 
-Clone this repoh $ `git clone git@github.com:KerliS9/breweries.git`
+Clone this repository $ `git clone git@github.com:KerliS9/breweries.git`
 
-Set your file `.env` fil like this:
+Set your `.env` file like this:
 ```
 POSTGRES_USER=your_name
 POSTGRES_PASSWORD=postgres_breweries
@@ -26,7 +26,7 @@ AIRFLOW__CORE__FERNET_KEY= run python -c "from cryptography.fernet import Fernet
 AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT=90
 AIRFLOW__WEBSERVER__SECRET_KEY= run python -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
-Run $ `docker-compose up -d --build`. Wait the building to finished.
+Run $ `docker-compose up -d --build`. Wait the building to finish.
 
 Check $ `docker logs airflow_init_breweries`. Line 'Database migrating done!' must be present at logs.
 
@@ -73,9 +73,9 @@ breweries/
 ```
 ## Decisions made
 
-I start using Flask to see request from API. Then change to Airflow scheduler, through docker compose, to make an integrated project.
+I started using Flask to see the request from API. Then changed to Airflow scheduler, through docker compose, to make an integrated project.
 
-The biggest challenge was configured the docker-compose for code run correctly.
+The biggest challenge was to configure the docker-compose for the code run correctly.
 
 ## Used technologies:
 
@@ -88,7 +88,7 @@ The biggest challenge was configured the docker-compose for code run correctly.
 - Airflow
 
 ## Monitoring and Alerting
-In case, I needed to set an alerting to my pipeline. I would add some configs to default args at the dag:
+Case I needed to set an alert to my pipeline, I would add some configs to default args at the dag:
 ```
 'email': ['kerlischroeder9@gmail.com'],
 'email_on_failure': True,
@@ -107,7 +107,7 @@ AIRFLOW__SMTP__SMTP_SSL: 'False'
 
 For quality checks it's possible to create and run a quality check with soda. For example: setting the columns that shouldn't be null or which columns should be present at the table.
 
-# Adicional
+# Additional
 
 ### Check Logs
 `docker logs [container_name] bash`
