@@ -18,14 +18,19 @@ ENV SPARK_VERSION=3.4.1
 RUN curl -L https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
     | tar -xz -C /opt/ && ln -s /opt/spark-${SPARK_VERSION}-bin-hadoop3 /opt/spark
 
+# Define variáveis necessárias para o PySpark encontrar o Spark e seus componentes
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$SPARK_HOME/bin:$PATH
+ENV PYTHONPATH=$SPARK_HOME/python:$PYTHONPATH
+
 # Criar diretório para os JARs do Delta
 RUN mkdir -p /opt/spark/jars && \
-    curl -L -o /opt/spark/jars/delta-core_2.12-2.4.0.jar https://repo1.maven.org/maven2/io/delta/delta-core_2.12/2.4.0/delta-core_2.12-2.4.0.jar && \
-    curl -L -o /opt/spark/jars/delta-storage-2.4.0.jar https://repo1.maven.org/maven2/io/delta/delta-storage/2.4.0/delta-storage-2.4.0.jar
+    curl -fL -o /opt/spark/jars/delta-core_2.12-2.4.0.jar https://repo1.maven.org/maven2/io/delta/delta-core_2.12/2.4.0/delta-core_2.12-2.4.0.jar && \
+    curl -fL -o /opt/spark/jars/delta-storage-2.4.0.jar https://repo1.maven.org/maven2/io/delta/delta-storage/2.4.0/delta-storage-2.4.0.jar
 
 # Copiar código-fonte e testes
 COPY src/ src/
 COPY tests/ tests/
 
 # Comando de execução dos testes
-CMD ["pytest", "--cov=src", "--cov=dags", "--cov-report=term-missing", "-v", "tests"]
+CMD ["pytest", "--cov=src", "--cov-report=term-missing", "-v", "tests"]

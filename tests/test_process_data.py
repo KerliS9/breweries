@@ -31,7 +31,7 @@ def test_normalize_and_partition_breweries(spark_session, mocker):
         'src.utils.init_spark', 
         return_value=spark_session
     )
-    mock_write_delta = mocker.patch("src.elt_utils.write.write_delta_partitioned")
+    mock_write_delta = mocker.patch("src.process_data.write.write_delta_partitioned")
 
     test_data = [
         {"data": '{"id": "1", "name": "Brew1", "country": "US"}', "timestamp_ingestion": "2023-01-01T00:00:00"},
@@ -39,14 +39,14 @@ def test_normalize_and_partition_breweries(spark_session, mocker):
     ]
     test_df = spark_session.createDataFrame(test_data)
 
-    mocker.patch(
-        'pyspark.sql.SparkSession.read',
-        return_value=MagicMock(load=MagicMock(return_value=test_df))
-    )
+    mock_read = mocker.MagicMock()
+    mock_read.option.return_value = mock_read
+    mock_read.load.return_value = test_df
+
     mocker.patch.object(
-        spark_session.read.option("inferSchema", "true"),
-        'load',
-        return_value=test_df
+        type(spark_session), "read",
+        new_callable=PropertyMock,
+        return_value=mock_read
     )
 
     normalize_and_partition_breweries()
@@ -67,18 +67,18 @@ def test_empty_data_handling(spark_session, mocker):
         'src.utils.init_spark', 
         return_value=spark_session
     )
-    mock_write_delta = mocker.patch("src.elt_utils.write.write_delta_partitioned")
+    mock_write_delta = mocker.patch("src.process_data.write.write_delta_partitioned")
 
     test_df = spark_session.createDataFrame([], "data: string, timestamp_ingestion: timestamp")
 
-    mocker.patch(
-        'pyspark.sql.SparkSession.read',
-        return_value=MagicMock(load=MagicMock(return_value=test_df))
-    )
+    mock_read = mocker.MagicMock()
+    mock_read.option.return_value = mock_read
+    mock_read.load.return_value = test_df
+
     mocker.patch.object(
-        spark_session.read.option("inferSchema", "true"),
-        'load',
-        return_value=test_df
+        type(spark_session), "read",
+        new_callable=PropertyMock,
+        return_value=mock_read
     )
 
     normalize_and_partition_breweries()
@@ -92,7 +92,7 @@ def test_malformed_json_handling(spark_session, mocker, caplog):
         'src.utils.init_spark', 
         return_value=spark_session
     )
-    mock_write_delta = mocker.patch("src.elt_utils.write.write_delta_partitioned")
+    mock_write_delta = mocker.patch("src.process_data.write.write_delta_partitioned")
 
     test_data = [
         {"data": '{"id": "1", "name": "Good Brew"}', "timestamp_ingestion": "2023-01-01T00:00:00"},
@@ -100,14 +100,14 @@ def test_malformed_json_handling(spark_session, mocker, caplog):
     ]
     test_df = spark_session.createDataFrame(test_data)
 
-    mocker.patch(
-        'pyspark.sql.SparkSession.read',
-        return_value=MagicMock(load=MagicMock(return_value=test_df))
-    )
+    mock_read = mocker.MagicMock()
+    mock_read.option.return_value = mock_read
+    mock_read.load.return_value = test_df
+
     mocker.patch.object(
-        spark_session.read.option("inferSchema", "true"),
-        'load',
-        return_value=test_df
+        type(spark_session), "read",
+        new_callable=PropertyMock,
+        return_value=mock_read
     )
 
     normalize_and_partition_breweries()
@@ -123,7 +123,7 @@ def test_schema_validation(spark_session, mocker):
         'src.utils.init_spark', 
         return_value=spark_session
     )
-    mock_write_delta = mocker.patch("src.elt_utils.write.write_delta_partitioned")
+    mock_write_delta = mocker.patch("src.process_data.elt_utils.write.write_delta_partitioned")
 
     test_data = [
         {"data": '{"id": "1", "name": "Brew1", "country": "US", "extra_field": "value"}', 
@@ -131,14 +131,14 @@ def test_schema_validation(spark_session, mocker):
     ]
     test_df = spark_session.createDataFrame(test_data)
 
-    mocker.patch(
-        'pyspark.sql.SparkSession.read',
-        return_value=MagicMock(load=MagicMock(return_value=test_df))
-    )
+    mock_read = mocker.MagicMock()
+    mock_read.option.return_value = mock_read
+    mock_read.load.return_value = test_df
+
     mocker.patch.object(
-        spark_session.read.option("inferSchema", "true"),
-        'load',
-        return_value=test_df
+        type(spark_session), "read",
+        new_callable=PropertyMock,
+        return_value=mock_read
     )
 
     normalize_and_partition_breweries()
@@ -153,7 +153,7 @@ def test_partitioning_logic(spark_session, mocker):
         'src.utils.init_spark', 
         return_value=spark_session
     )
-    mock_write_delta = mocker.patch("src.elt_utils.write.write_delta_partitioned")
+    mock_write_delta = mocker.patch("src.process_data.elt_utils.write.write_delta_partitioned")
 
     test_data = [
         {"data": '{"id": "1", "name": "Brew1", "country": "US"}', "timestamp_ingestion": "2023-01-01T00:00:00"}
