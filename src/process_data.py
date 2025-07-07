@@ -26,7 +26,7 @@ def normalize_and_partition_breweries():
     df_final = (
         df_raw
         .withColumn('json_data', from_json(col('data'), breweries_schema))
-        .filter(col("json_data").isNotNull())
+        .filter(col("json_data.id").isNotNull())
         .select(
           *[trim(col(f"json_data.{field.name}")).alias(field.name) 
             for field in breweries_schema.fields 
