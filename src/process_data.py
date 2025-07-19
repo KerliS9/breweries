@@ -1,5 +1,5 @@
 import json
-from pyspark.sql.functions import lit, current_timestamp, from_json, col, trim
+from pyspark.sql.functions import current_timestamp, from_json, col, trim
 from pyspark.sql.types import StringType
 
 from utils import init_spark
