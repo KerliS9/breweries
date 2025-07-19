@@ -32,7 +32,9 @@ Check $ `docker logs airflow_init_breweries`. Line 'Database migrating done!' mu
 
 Run $ `chmod -R 777 ./volumes/warehouse` for Airflow to have access to read and write inside the volumes of this project.
 
-Then open the browser with `http://localhost:8080`
+Then open the browser with `http://localhost:8080`. 
+If you are running through wsl, and localhost is not working, run in wsl `curl http://localhost:8080`.
+
 ```
 user: admin
 password: admin
@@ -74,6 +76,7 @@ breweries/
 ## Decisions made
 
 I started using Flask to see the request from API. Then changed to Airflow scheduler, through docker compose, to make an integrated project.
+I've implemented all the data processing logic in a separate module called process_data.py as part of this project exercise. In a production environment, it makes sense to maintain separation between different architectural layers. I implemented the same overwrite logic for the Bronze layer in this project, as using append mode would generate excessive redundant data.
 
 The biggest challenge was to configure the docker-compose for the code run correctly.
 

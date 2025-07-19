@@ -2,7 +2,7 @@ from pyspark.sql.types import StructType, StructField, StringType, DoubleType
 
 
 breweries_schema = StructType([
-    StructField("id", StringType(), True),
+    StructField("id", StringType(), False),
     StructField("name", StringType(), True),
     StructField("brewery_type", StringType(), True),
     StructField("address_1", StringType(), True),
